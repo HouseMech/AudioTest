@@ -1,17 +1,27 @@
+<script setup>
+import { ref } from 'vue'
+import VolumeSlider from './VolumeSlider.vue'
+</script>
 <template>
   <div>
-    <input
-      type="file"
-      ref="track1"
-      accept="audio/*"
-      @change="handleTrackChange(1)"
-    />
-    <input
-      type="file"
-      ref="track2"
-      accept="audio/*"
-      @change="handleTrackChange(2)"
-    />
+    <div style="display: flex">
+      <div class="track-num">Track #1</div>
+      <input
+        type="file"
+        ref="track1"
+        accept="audio/*"
+        @change="handleTrackChange(1)"
+      />
+    </div>
+    <div style="display: flex">
+      <div class="track-num">Track #2</div>
+      <input
+        type="file"
+        ref="track2"
+        accept="audio/*"
+        @change="handleTrackChange(2)"
+      />
+    </div>
     <div style="display: flex; flex-direction: column">
       <button @click="startTracks">Play</button>
       <button
@@ -21,6 +31,7 @@
         Start Crossfade
       </button>
     </div>
+    <VolumeSlider v-model:volume="volume" />
     <br />
     <br />
     <div>
@@ -48,6 +59,7 @@ export default {
       track1Gain: null, // First track volume control
       track2Gain: null, // Second track volume control
       currentTrack: 1, // 1 for track 1, 2 for track 2
+      volume: ref(0.75),
     }
   },
   methods: {
@@ -121,7 +133,7 @@ export default {
       }
     },
     async doCrossfade(track1Gain, track2Gain, fadeDuration) {
-      track1Gain.gain.setValueAtTime(1, this.audioContext.currentTime)
+      track1Gain.gain.setValueAtTime(this.volume, this.audioContext.currentTime)
       track1Gain.gain.linearRampToValueAtTime(
         0,
         this.audioContext.currentTime + fadeDuration,
@@ -129,7 +141,7 @@ export default {
 
       track2Gain.gain.setValueAtTime(0, this.audioContext.currentTime)
       track2Gain.gain.linearRampToValueAtTime(
-        1,
+        this.volume,
         this.audioContext.currentTime + fadeDuration,
       )
 
@@ -162,5 +174,8 @@ input[type='range'] {
 }
 button {
   margin-top: 10px;
+}
+.track-num {
+  margin-right: 10px;
 }
 </style>
