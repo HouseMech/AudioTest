@@ -115,35 +115,38 @@ export default {
       const fadeDuration = this.fadeDuration
 
       if (this.currentTrack === 1) {
-        // Fade out track 1, fade in track 2
-        this.track1Gain.gain.setValueAtTime(1, this.audioContext.currentTime)
-        this.track1Gain.gain.linearRampToValueAtTime(
-          0,
-          this.audioContext.currentTime + fadeDuration,
-        )
-
-        this.track2Gain.gain.setValueAtTime(0, this.audioContext.currentTime)
-        this.track2Gain.gain.linearRampToValueAtTime(
-          1,
-          this.audioContext.currentTime + fadeDuration,
-        )
-
-        this.currentTrack = 2 // Toggle to track 2
+        this.doCrossfade(this.track1Gain, this.track2Gain, fadeDuration)
       } else {
-        // Fade out track 2, fade in track 1
-        this.track2Gain.gain.setValueAtTime(1, this.audioContext.currentTime)
-        this.track2Gain.gain.linearRampToValueAtTime(
-          0,
-          this.audioContext.currentTime + fadeDuration,
-        )
+        this.doCrossfade(this.track2Gain, this.track1Gain, fadeDuration)
+      }
+    },
+    async doCrossfade(track1Gain, track2Gain, fadeDuration) {
+      track1Gain.gain.setValueAtTime(1, this.audioContext.currentTime)
+      track1Gain.gain.linearRampToValueAtTime(
+        0,
+        this.audioContext.currentTime + fadeDuration,
+      )
 
-        this.track1Gain.gain.setValueAtTime(0, this.audioContext.currentTime)
-        this.track1Gain.gain.linearRampToValueAtTime(
-          1,
-          this.audioContext.currentTime + fadeDuration,
-        )
+      track2Gain.gain.setValueAtTime(0, this.audioContext.currentTime)
+      track2Gain.gain.linearRampToValueAtTime(
+        1,
+        this.audioContext.currentTime + fadeDuration,
+      )
 
-        this.currentTrack = 1 // Toggle back to track 1
+      //toggle between the two tracks
+      if (this.currentTrack == 1) {
+        this.currentTrack = 2
+      } else {
+        this.currentTrack = 1
+      }
+    },
+  },
+  watch: {
+    volume(newVolume) {
+      if (this.currentTrack == 1) {
+        this.track1Gain.gain.value = newVolume
+      } else {
+        this.track2Gain.gain.value = newVolume
       }
     },
   },
