@@ -110,6 +110,10 @@ export default {
         this.track1Gain = this.audioContext.createGain()
         this.track2Gain = this.audioContext.createGain()
 
+        // Set the started track to the current volume.
+        this.track1Gain.value = this.volume
+        console.log('Current Volume: ' + this.track1Gain.value)
+
         this.track1Source
           .connect(this.track1Gain)
           .connect(this.audioContext.destination)
@@ -152,14 +156,19 @@ export default {
         this.currentTrack = 1
       }
     },
+    changeCurrentTrackVolume() {
+      if (this.track1Gain && this.track2Gain) {
+        if (this.currentTrack == 1) {
+          this.track1Gain.gain.value = this.volume
+        } else {
+          this.track2Gain.gain.value = this.volume
+        }
+      }
+    },
   },
   watch: {
-    volume(newVolume) {
-      if (this.currentTrack == 1) {
-        this.track1Gain.gain.value = newVolume
-      } else {
-        this.track2Gain.gain.value = newVolume
-      }
+    volume() {
+      this.changeCurrentTrackVolume()
     },
   },
 }
