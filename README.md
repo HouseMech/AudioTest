@@ -1,6 +1,6 @@
 # Boss Fight Crossfader
 
-Ever since playing games like Metal Gear Rising and Nier: Automata, I've developed a fascination with dynamic music tracks. I wanted to try using dynamic tracks in my Dungeons and Dragons games. I did some research into what other people have tried, programs and such and I used several of them, but I couldn't find one that had exactly what I needed. I built this tiny application to help me crossfade one track into another and back upon command.
+Ever since playing games like Metal Gear Rising and Nier: Automata, I've developed a fascination with dynamic music tracks. I decided to try my hand at building this tiny application to use for my own Dungeons and Dragons games.
 
 ## Recommended IDE Setup
 
