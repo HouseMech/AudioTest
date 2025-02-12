@@ -4,6 +4,9 @@ import VolumeSlider from './VolumeSlider.vue'
 </script>
 <template>
   <div>
+    <div v-if="track1Buffer && track2Buffer">
+      <h2>Now Playing...Track {{ currentTrack }}</h2>
+    </div>
     <div style="display: flex">
       <div class="track-num">Track #1</div>
       <input
@@ -39,6 +42,11 @@ import VolumeSlider from './VolumeSlider.vue'
       <button @click="stopAll">Stop All Tracks</button>
       <button @click="stopTrack2">Stop Track 2</button>
     </div>
+    <div>
+      <br />
+      <input type="checkbox" id="loop" name="loop" v-model="loop" />
+      <label for="loop"> Loop Tracks</label><br />
+    </div>
 
     <label for="fadeDuration">Crossfade Duration (seconds):</label>
     <input type="range" v-model="fadeDuration" min="1" max="10" />
@@ -60,6 +68,7 @@ export default {
       track2Gain: null, // Second track volume control
       currentTrack: 1, // 1 for track 1, 2 for track 2
       volume: ref(0.75),
+      loop: false,
     }
   },
   methods: {
@@ -125,6 +134,8 @@ export default {
         this.track2Source.start()
 
         this.track2Gain.gain.setValueAtTime(0, this.audioContext.currentTime)
+        console.log(this.track1Source)
+        console.log(this.track1Buffer)
       }
     },
     async startCrossfade() {
@@ -169,6 +180,12 @@ export default {
   watch: {
     volume() {
       this.changeCurrentTrackVolume()
+    },
+    loop() {
+      console.log('Loop changed to: ' + this.loop)
+      this.track1Source.loop = this.loop
+      this.track2Source.loop = this.loop
+      console.log(this.track1Source)
     },
   },
 }
