@@ -5,7 +5,7 @@ import LoadingIcon from './LoadingIcon.vue'
 </script>
 <template>
   <div>
-    <div v-if="track1Buffer && track2Buffer && track1Gain && track2Gain">
+    <div v-if="playing">
       <h2>Now Playing...Track {{ currentTrack }}</h2>
     </div>
     <div style="display: flex">
@@ -74,6 +74,7 @@ export default {
       loop: false,
       loading1: false,
       loading2: false,
+      playing: false,
     }
   },
   methods: {
@@ -126,6 +127,7 @@ export default {
         this.stopAll() //Stop all tracks in preparation for removal and cleanup.
         this.currentTrack = 1
       }
+      this.playing = true
       this.track1Source = this.audioContext.createBufferSource()
       this.track2Source = this.audioContext.createBufferSource()
       this.track1Source.buffer = this.track1Buffer
@@ -135,7 +137,7 @@ export default {
       this.track2Gain = this.audioContext.createGain()
 
       // Set the started track to the current volume.
-      this.track1Gain.value = this.volume
+      this.track1Gain.gain.value = this.volume
       console.log('Current Volume: ' + this.track1Gain.value)
 
       this.track1Source
