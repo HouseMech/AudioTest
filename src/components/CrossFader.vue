@@ -5,7 +5,7 @@ import LoadingIcon from './LoadingIcon.vue'
 </script>
 <template>
   <div>
-    <div v-if="track1Buffer && track2Buffer">
+    <div v-if="track1Buffer && track2Buffer && track1Gain && track2Gain">
       <h2>Now Playing...Track {{ currentTrack }}</h2>
     </div>
     <div style="display: flex">
@@ -41,9 +41,9 @@ import LoadingIcon from './LoadingIcon.vue'
     <br />
     <br />
     <div>
-      <button @click="stopTrack1">Stop Track 1</button>
-      <button @click="stopAll">Stop All Tracks</button>
-      <button @click="stopTrack2">Stop Track 2</button>
+      <button @click="pauseTracks">Pause</button>
+      <button @click="resumeTracks">Resume</button>
+      <button @click="stopAll">Stop</button>
     </div>
     <div>
       <br />
@@ -122,33 +122,36 @@ export default {
         alert('Please upload both tracks!')
         return
       }
-      if (!this.track1Source || !this.track2Source) {
-        this.track1Source = this.audioContext.createBufferSource()
-        this.track2Source = this.audioContext.createBufferSource()
-        this.track1Source.buffer = this.track1Buffer
-        this.track2Source.buffer = this.track2Buffer
-
-        this.track1Gain = this.audioContext.createGain()
-        this.track2Gain = this.audioContext.createGain()
-
-        // Set the started track to the current volume.
-        this.track1Gain.value = this.volume
-        console.log('Current Volume: ' + this.track1Gain.value)
-
-        this.track1Source
-          .connect(this.track1Gain)
-          .connect(this.audioContext.destination)
-        this.track2Source
-          .connect(this.track2Gain)
-          .connect(this.audioContext.destination)
-
-        this.track1Source.start()
-        this.track2Source.start()
-
-        this.track2Gain.gain.setValueAtTime(0, this.audioContext.currentTime)
-        console.log(this.track1Source)
-        console.log(this.track1Buffer)
+      if (this.track1Source || this.track2Source) {
+        this.stopAll() //Stop all tracks in preparation for removal and cleanup.
+        this.currentTrack = 1
       }
+      this.track1Source = this.audioContext.createBufferSource()
+      this.track2Source = this.audioContext.createBufferSource()
+      this.track1Source.buffer = this.track1Buffer
+      this.track2Source.buffer = this.track2Buffer
+
+      this.track1Gain = this.audioContext.createGain()
+      this.track2Gain = this.audioContext.createGain()
+
+      // Set the started track to the current volume.
+      this.track1Gain.value = this.volume
+      console.log('Current Volume: ' + this.track1Gain.value)
+
+      this.track1Source
+        .connect(this.track1Gain)
+        .connect(this.audioContext.destination)
+      this.track2Source
+        .connect(this.track2Gain)
+        .connect(this.audioContext.destination)
+
+      this.track1Source.start()
+      this.track2Source.start()
+
+      this.track2Gain.gain.setValueAtTime(0, this.audioContext.currentTime)
+      console.log(this.track1Source)
+      console.log(this.track1Buffer)
+      console.log(this.audioContext)
     },
     async startCrossfade() {
       const fadeDuration = this.fadeDuration
@@ -187,6 +190,12 @@ export default {
           this.track2Gain.gain.value = this.volume
         }
       }
+    },
+    pauseTracks() {
+      if (this.audioContext) this.audioContext.suspend()
+    },
+    resumeTracks() {
+      if (this.audioContext) this.audioContext.resume()
     },
   },
   watch: {
