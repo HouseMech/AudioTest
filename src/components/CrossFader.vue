@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import VolumeSlider from './VolumeSlider.vue'
+import LoadingIcon from './LoadingIcon.vue'
 </script>
 <template>
   <div>
@@ -15,6 +16,7 @@ import VolumeSlider from './VolumeSlider.vue'
         accept="audio/*"
         @change="handleTrackChange(1)"
       />
+      <LoadingIcon v-if="loading1" />
     </div>
     <div style="display: flex">
       <div class="track-num">Track #2</div>
@@ -24,6 +26,7 @@ import VolumeSlider from './VolumeSlider.vue'
         accept="audio/*"
         @change="handleTrackChange(2)"
       />
+      <LoadingIcon v-if="loading2" />
     </div>
     <div style="display: flex; flex-direction: column">
       <button @click="startTracks">Play</button>
@@ -69,19 +72,28 @@ export default {
       currentTrack: 1, // 1 for track 1, 2 for track 2
       volume: ref(0.75),
       loop: false,
+      loading1: false,
+      loading2: false,
     }
   },
   methods: {
     // Load and decode the selected audio files
     async handleTrackChange(trackNumber) {
       const fileInput = this.$refs[`track${trackNumber}`]
+      if (trackNumber === 1) {
+        this.loading1 = true
+      } else {
+        this.loading2 = true
+      }
       if (fileInput && fileInput.files.length > 0) {
         const file = fileInput.files[0]
         const fileData = await this.loadAudioFile(file)
         if (trackNumber === 1) {
           this.track1Buffer = fileData
+          this.loading1 = false
         } else if (trackNumber === 2) {
           this.track2Buffer = fileData
+          this.loading2 = false
         }
       }
     },
